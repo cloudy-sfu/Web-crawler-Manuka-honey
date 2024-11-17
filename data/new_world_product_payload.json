@@ -1,0 +1,44 @@
+{
+    "algoliaQuery": {
+        "attributesToHighlight": [],
+        "attributesToRetrieve": [
+            "productID",
+            "Type",
+            "sponsored",
+            "category0NI",
+            "category1NI",
+            "category2NI"
+        ],
+        "facets": [
+            "brand",
+            "category1NI",
+            "onPromotion",
+            "productFacets",
+            "tobacco"
+        ],
+        "filters": "stores:",
+        "highlightPostTag": "__/ais-highlight__",
+        "highlightPreTag": "__ais-highlight__",
+        "hitsPerPage": 50,
+        "maxValuesPerFacet": 100,
+        "page": 0,
+        "query": ""
+    },
+    "algoliaFacetQueries": [],
+    "storeId": "",
+    "hitsPerPage": 50,
+    "page": 0,
+    "sortOrder": "NI_POPULARITY_ASC",
+    "tobaccoQuery": true,
+    "precisionMedia": {
+        "adDomain": "SEARCH_PAGE",
+        "adPositions": [
+            4,
+            8,
+            12,
+            16
+        ],
+        "publishImpressionEvent": true,
+        "disableAds": false
+    }
+}
