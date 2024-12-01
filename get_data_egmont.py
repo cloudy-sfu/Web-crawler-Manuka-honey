@@ -1,8 +1,8 @@
 # https://www.egmonthoney.co.nz/collections/umf-manuka-honey
 import json
 import logging
-import re
 
+import pandas as pd
 from bs4 import BeautifulSoup
 from requests import Session
 
@@ -51,15 +51,14 @@ def search_egmont():
         yield {
             'brand': 'egmont',
             'retailer': 'egmont',
-            # 'weight': extract_weight(item.get('size', {}).get('volumeSize', '')),
-            '_claimed_umf': umf,
-            '_claimed_mgo': mgo,
+            'weight': extract_weight(name),
+            'UMF': umf,
+            'MGO': mgo,
             'price': price,
             'value': price,
         }
 
 
-# %%
 def parse_honey_string(title):
     # Separate regex patterns for different components
     num_pattern = re.compile(r"x(\d+)", re.IGNORECASE)
@@ -78,16 +77,13 @@ def parse_honey_string(title):
     }
 
 
-# %%
-def get_egmont_bundle():
+def get_egmont_bundle(single_item: pd.DataFrame):
     bundles = {
         "Soothe & Vitality Bundle":
             "https://www.egmonthoney.co.nz/products/soothe-vitality-bundle",
         "Intense Support Bundle":
             "https://www.egmonthoney.co.nz/products/intense-support-bundle"
     }
-    bundle_list = []
-
     for bundle_name, bundle_url in bundles.items():
         response = sess.get(url=bundle_url, headers=header)
         assert response.status_code == 200, "Fail to get Egmont bundle products."
@@ -101,15 +97,40 @@ def get_egmont_bundle():
             total_price = float(total_price.group())
         except:
             logging.warning(f"Total price of {bundle_name} in Egmont is not parsed.")
-            total_price = None
-        bundle = {'total': total_price, 'content': []}
+            continue
+        content = []
 
         # Get bundle contents.
         raw_bundle_list = response_html.find('ul', {'data-mce-fragment': '1'})
         if not raw_bundle_list:
             logging.warning(f"Products list of {bundle_name} in Egmont is not parsed.")
         for item in raw_bundle_list.find_all('li', {'data-mce-fragment': '1'}):
-            bundle['content'].append(parse_honey_string(item.text))
-        bundle_list.append(bundle)
+            content.append(parse_honey_string(item.text))
+        content = pd.DataFrame(content)
 
-    return bundle_list
+        # Update "value" column in single items' table.
+        content['mgo'] = content['umf'].apply(egmont_umf_to_mgo.get)
+
+        def lookup_price(row):
+            # Filter single_item for the same mgo and find the closest weight
+            filtered = single_item[single_item["MGO"] == row["mgo"]]
+            if not filtered.empty:
+                # Find the closest weight
+                closest_row = filtered.iloc[
+                    (filtered["weight"] - row["weight"]).abs().argsort().iloc[0]
+                ]
+                # closest_rows.append(closest_row.name)
+                return (closest_row["price"] / closest_row["weight"] * row["weight"],
+                        int(closest_row.name))
+
+        content[['single_price', 'single_item_idx']] = (
+            content.apply(lookup_price, axis=1).apply(pd.Series)
+        )
+        bundle_discount_ratio = ((content['num'] * content['single_price']).sum()
+                                 / total_price)
+        content['value'] = content['single_price'] / max(bundle_discount_ratio, 1)
+        single_item.loc[
+            content["single_item_idx"], "value"
+        ] = content['value'].values
+
+    return single_item

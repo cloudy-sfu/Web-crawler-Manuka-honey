@@ -1,7 +1,37 @@
+import os
+
 from get_data_woolworths import search_woolworths
 from get_data_new_world import search_new_world
 from get_data_egmont import search_egmont, get_egmont_bundle
+from get_data_arataki import search_arataki
+import pandas as pd
+from umf_mgo_conversion import mgo_to_umf, umf_to_mgo
 
-honey_list = []
-for item in search_woolworths():
-    honey_list.append(item)
+# %% Get data.
+honey_woolworth = pd.DataFrame(iter(search_woolworths()))
+honey_new_world_egmont = pd.DataFrame(iter(search_new_world(
+    brand="egmont",
+    # city center metro, has most honey's searching results by experience
+    store_id="38b074c4-0e5a-4bd5-b743-d30f28d94982",
+)))
+honey_new_world_arataki = pd.DataFrame(iter(search_new_world(
+    brand="arataki",
+    store_id="38b074c4-0e5a-4bd5-b743-d30f28d94982",
+)))
+honey_egmont = pd.DataFrame(iter(search_egmont()))
+honey_egmont = get_egmont_bundle(honey_egmont)
+honey_arataki = pd.DataFrame(iter(search_arataki()))
+
+# %% Pre-processing.
+honey = pd.concat([honey_woolworth, honey_new_world_arataki, honey_new_world_egmont,
+                   honey_egmont, honey_arataki],
+                  axis=0, ignore_index=True)
+honey.dropna(subset=['UMF', 'MGO'], how='all', inplace=True)
+honey['UMF'] = honey.apply(lambda row: mgo_to_umf(row['MGO'])
+if pd.isna(row['UMF']) and not pd.isna(row['MGO']) else row['UMF'], axis=1)
+honey['MGO'] = honey.apply(lambda row: umf_to_mgo(row['UMF'])
+if pd.isna(row['MGO']) and not pd.isna(row['UMF']) else row['MGO'], axis=1)
+
+# %% Export.
+os.makedirs("results", exist_ok=True)
+honey.to_excel("results/manuka_honey_price.xlsx", index=False)

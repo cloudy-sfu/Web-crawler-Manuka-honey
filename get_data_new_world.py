@@ -26,12 +26,8 @@ brand_name_renamer = {
     "egmont honey": "egmont"
 }
 
-def search_new_world():
-    searching_query = "egmont manuka"
-    # city center metro, has most honey's searching results by experience
-    store_id = "38b074c4-0e5a-4bd5-b743-d30f28d94982"
-
-    # Get timestamp in unit of ms.
+def search_new_world(brand: str, store_id: str):
+    searching_query = f"{brand} manuka honey"
     timestamp_ms = int(time() * 1000)
 
     # Generate newrelic dict.
@@ -84,19 +80,11 @@ def search_new_world():
     )
     products_resp_dict = products_resp.json()
 
-    # Validate the current store has most promotion.
-    promotions = (products_resp_dict.get("algoliaSearchResult", {}).get("facets", {})
-                  .get("onPromotion", {}))
+    # Validate n_pages = 1
     pages = products_resp_dict.get("totalPages")
     if pages != 1:
         logging.warning("The products list of New World has more than 1 page. This "
                         "program doesn't support multiple pages, please update.")
-    if promotions[store_id] < max(promotions.values()):
-        with open("results/new_world_promotion.json", "w") as g:
-            json.dump(promotions, g)
-        logging.warning(f"This New World store {store_id} is not the cheapest. The number "
-                        f"of products on promotion in each store is saved at "
-                        f"\"raw/new_world_promotion.json\". ")
 
     products = products_resp_dict.get("products", {})
     for product in products:
@@ -123,11 +111,11 @@ def search_new_world():
                 else:
                     price = min(proposed_price, price)
         yield {
-            'brand': brand_name_renamer.get(raw_brand) or raw_brand,
+            'brand': re.sub("\s*honey\s*", "", raw_brand),
             'retailer': "new_world",
             'weight': extract_weight(product.get("displayName", "")),
-            '_claimed_umf': umf,
-            '_claimed_mgo': mgo,
+            'UMF': umf,
+            'MGO': mgo,
             'price': price,
             'value': price_value,
         }

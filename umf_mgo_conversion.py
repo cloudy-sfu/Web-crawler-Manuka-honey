@@ -4,7 +4,7 @@ max_iteration = 6  # mgo = 0 requires 6 iteration
 
 def umf_to_mgo(umf: int):
     # ref: https://www.umf.org.nz/unique-manuka-factor/
-    return -0.0106763961 * umf**3 + 1.76329448 * umf**2 + 11.0752267 * umf - 15.1796541
+    return round(-0.0106763961 * umf**3 + 1.76329448 * umf**2 + 11.0752267 * umf - 15.1796541)
 
 
 def umf_to_mgo_d1(umf: int):
@@ -20,4 +20,4 @@ def mgo_to_umf(mgo: float):
             break
         mgo_0_d1 = umf_to_mgo_d1(umf)
         umf = umf - mgo_0 / mgo_0_d1
-    return int(umf)
+    return round(umf)

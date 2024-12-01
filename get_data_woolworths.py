@@ -35,7 +35,7 @@ def search_woolworths():
         umf, mgo = extract_umf_mgo(item.get('variety', ''))
         if item.get('sku') == "489747":
             mgo = 85  # read from the picture
-        price = item.get('salePrice')
+        price = item.get('price', {}).get('salePrice')
         if item.get('productTag') and item['productTag'].get('tagType') == "IsMultiBuy":
             multi_cup_value = item['productTag'].get('multiBuy', {}).get('multiCupValue')
         else:
@@ -44,8 +44,8 @@ def search_woolworths():
             'brand': item.get('brand'),
             'retailer': 'woolworths',
             'weight': extract_weight(item.get('size', {}).get('volumeSize', '')),
-            '_claimed_umf': umf,
-            '_claimed_mgo': mgo,
+            'UMF': umf,
+            'MGO': mgo,
             'price': price,
             'value': multi_cup_value,
         }
