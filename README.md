@@ -36,6 +36,7 @@ In Python virtual environment, run the following command.
 
 ```
 python main.py
+python visualization.py
 ```
 
 The result can be found in `results/manuka_honey_price.xlsx`.
