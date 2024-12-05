@@ -22,6 +22,9 @@ def extract_umf_mgo(title):
     mgo = int(mgo_match.group(1) or mgo_match.group(2)) if mgo_match else None
     return umf, mgo
 
+def extract_float(s):
+    match = re.search(r'\d+\.?\d*', s)
+    return float(match.group()) if match else None
 
 if __name__ == '__main__':
     assert extract_umf_mgo("Limited Edition Manuka Honey 23+ UMF") == (23, None)

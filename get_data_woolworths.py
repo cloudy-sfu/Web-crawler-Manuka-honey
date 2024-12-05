@@ -10,14 +10,14 @@ with open("headers/woolworths.json", "r") as f:
     header = json.load(f)
 
 
-def search_woolworths():
+def search_woolworths(search_word: str):
     # Request the page.
     response = sess.get(
         url="https://www.woolworths.co.nz/api/v1/products",
         headers=header,
         params={
             "target": "search",
-            "search": "egmont manuka",
+            "search": search_word,
             "inStockProductsOnly": "false",
             "size": "48"
         }
@@ -32,7 +32,7 @@ def search_woolworths():
     except (KeyError, TypeError):
         return
     for item in items:
-        umf, mgo = extract_umf_mgo(item.get('variety', ''))
+        umf, mgo = extract_umf_mgo(item.get('variety', '') or '')
         if item.get('sku') == "489747":
             mgo = 85  # read from the picture
         price = item.get('price', {}).get('salePrice')

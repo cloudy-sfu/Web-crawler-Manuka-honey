@@ -4,11 +4,14 @@ from get_data_woolworths import search_woolworths
 from get_data_new_world import search_new_world
 from get_data_egmont import search_egmont, get_egmont_bundle
 from get_data_arataki import search_arataki
+from get_data_manuka_doctor import search_manuka_doctor
 import pandas as pd
 from umf_mgo_conversion import mgo_to_umf, umf_to_mgo
 
 # %% Get data.
-honey_woolworth = pd.DataFrame(iter(search_woolworths()))
+honey_woolworth = pd.DataFrame(iter(search_woolworths(
+    search_word="egmont manuka",
+)))
 honey_new_world_egmont = pd.DataFrame(iter(search_new_world(
     brand="egmont",
     # city center metro, has most honey's searching results by experience
@@ -21,12 +24,17 @@ honey_new_world_arataki = pd.DataFrame(iter(search_new_world(
 honey_egmont = pd.DataFrame(iter(search_egmont()))
 honey_egmont = get_egmont_bundle(honey_egmont)
 honey_arataki = pd.DataFrame(iter(search_arataki()))
+honey_doctors = pd.DataFrame(iter(search_manuka_doctor()))
+honey_woolworth_doctors = pd.DataFrame(iter(search_woolworths(
+    search_word="manuka \"doctor\""
+)))
 
 # %% Pre-processing.
 honey = pd.concat([honey_woolworth, honey_new_world_arataki, honey_new_world_egmont,
-                   honey_egmont, honey_arataki],
+                   honey_egmont, honey_arataki, honey_doctors, honey_woolworth_doctors],
                   axis=0, ignore_index=True)
 honey.dropna(subset=['UMF', 'MGO'], how='all', inplace=True)
+# pandas.DataFrame.fillna doesn't accept a function.
 honey['UMF'] = honey.apply(lambda row: mgo_to_umf(row['MGO'])
 if pd.isna(row['UMF']) and not pd.isna(row['MGO']) else row['UMF'], axis=1)
 honey['MGO'] = honey.apply(lambda row: umf_to_mgo(row['UMF'])

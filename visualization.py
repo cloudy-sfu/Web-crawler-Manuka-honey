@@ -25,13 +25,13 @@ brand_handles = [plt.scatter([], [], color=plt.cm.tab10(i))
                   for i in range(len(brands))]
 brand_legend = ax.legend(handles=brand_handles, labels=brands.tolist(),
                          title="Brand", loc='upper left', fontsize=12,
-                         bbox_to_anchor=(0, 1))
-weight_labels = np.linspace(250, 1000, 4, dtype=int).tolist()
-weight_handles = [plt.scatter([], [], s=weight * 0.5, color='black', alpha=0.5)
+                         bbox_to_anchor=(0.1, 1))
+weight_labels = np.linspace(0.25, 1, 4).tolist()
+weight_handles = [plt.scatter([], [], s=weight * 500, color='black', alpha=0.5)
                   for weight in weight_labels]
 weight_legend = ax.legend(handles=weight_handles, labels=weight_labels,
-                          title="Pack size (g)", loc='upper left', fontsize=12,
-                          labelspacing=1.25, bbox_to_anchor=(0.15, 1))
+                          title="Pack size (kg)", loc='upper left', fontsize=12,
+                          labelspacing=1.25, bbox_to_anchor=(0, 1))
 ax.add_artist(brand_legend)
 
 fig.tight_layout()
