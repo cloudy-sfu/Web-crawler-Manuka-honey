@@ -10,8 +10,9 @@ Compare price of Manuka honey in New Zealand
 
 Included brands:
 
-- EGMONT
-- ARATAKI
+- Egmont
+- Arataki
+- Manuka doctor
 
 Included retailers:
 
@@ -19,6 +20,7 @@ Included retailers:
 - New World
 - Egmont gift shop
 - Arataki honey
+- Manuka doctor
 
 ## Install
 
