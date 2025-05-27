@@ -59,6 +59,7 @@ def search_new_world(brand: str, store_id: str):
     current_user_resp = sess.get(
         url="https://www.newworld.co.nz//CommonApi/Account/GetCurrentUser",
         headers=header_newrelic_ins,
+        timeout=3,
     )
     assert current_user_resp.status_code == 200, "Fail to request New World products list."
     token_dict = current_user_resp.json()
@@ -76,7 +77,8 @@ def search_new_world(brand: str, store_id: str):
     products_resp = sess.post(
         url="https://api-prod.newworld.co.nz/v1/edge/search/paginated/products",
         headers=header_products_ins,
-        data=json.dumps(products_payload_ins)
+        data=json.dumps(products_payload_ins),
+        timeout=3,
     )
     products_resp_dict = products_resp.json()
 

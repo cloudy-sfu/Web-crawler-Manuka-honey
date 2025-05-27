@@ -20,7 +20,8 @@ def search_woolworths(search_word: str):
             "search": search_word,
             "inStockProductsOnly": "false",
             "size": "48"
-        }
+        },
+        timeout=3,
     )
     assert response.status_code == 200, "Fail to get Woolworths products."
 

@@ -17,6 +17,7 @@ def search_manuka_doctor():
     response = sess.get(
         url="https://www.manukadoctor.co.nz/collections/umf-manuka-honey",
         headers=header,
+        timeout=3,
     )
     assert response.status_code == 200, "Fail to get Woolworths products."
     response_html = BeautifulSoup(response.text, 'html.parser')

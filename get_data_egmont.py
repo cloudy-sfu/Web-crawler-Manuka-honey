@@ -21,7 +21,7 @@ def search_egmont():
     # Request the page.
     response = sess.get(
         url="https://www.egmonthoney.co.nz/collections/umf-manuka-honey",
-        headers=header,
+        headers=header, timeout=3,
     )
     assert response.status_code == 200, "Fail to get Egmont independent products."
     response_html = BeautifulSoup(response.text, 'html.parser')
@@ -85,7 +85,7 @@ def get_egmont_bundle(single_item: pd.DataFrame):
             "https://www.egmonthoney.co.nz/products/intense-support-bundle"
     }
     for bundle_name, bundle_url in bundles.items():
-        response = sess.get(url=bundle_url, headers=header)
+        response = sess.get(url=bundle_url, headers=header, timeout=3)
         assert response.status_code == 200, "Fail to get Egmont bundle products."
         response_html = BeautifulSoup(response.text, 'html.parser')
 

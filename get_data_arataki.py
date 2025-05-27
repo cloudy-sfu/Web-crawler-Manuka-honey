@@ -16,7 +16,7 @@ def search_arataki():
     # Request the page.
     response = sess.get(
         url="https://www.aratakihoney.co.nz/collections/manuka-honey",
-        headers=header,
+        headers=header, timeout=3,
     )
     assert response.status_code == 200, "Fail to get Woolworths products."
     response_html = BeautifulSoup(response.text, 'html.parser')
