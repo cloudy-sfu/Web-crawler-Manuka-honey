@@ -55,7 +55,7 @@ def search_egmont():
             'UMF': umf,
             'MGO': mgo,
             'price': price,
-            'value': price,
+            'marginal_price': price,
         }
 
 
@@ -128,9 +128,9 @@ def get_egmont_bundle(single_item: pd.DataFrame):
         )
         bundle_discount_ratio = ((content['num'] * content['single_price']).sum()
                                  / total_price)
-        content['value'] = content['single_price'] / max(bundle_discount_ratio, 1)
+        content['marginal_price'] = content['single_price'] / max(bundle_discount_ratio, 1)
         single_item.loc[
-            content["single_item_idx"], "value"
-        ] = content['value'].values
+            content["single_item_idx"], 'marginal_price'
+        ] = content['marginal_price'].values
 
     return single_item

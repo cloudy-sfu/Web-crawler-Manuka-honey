@@ -32,6 +32,9 @@ def search_woolworths(search_word: str):
     except (KeyError, TypeError):
         return
     for item in items:
+        brand = item.get('brand')
+        if brand is None:
+            continue
         umf, mgo = extract_umf_mgo(item.get('variety', '') or '')
         if item.get('sku') == "489747":
             mgo = 85  # read from the picture
@@ -41,11 +44,11 @@ def search_woolworths(search_word: str):
         else:
             multi_cup_value = price
         yield {
-            'brand': item.get('brand'),
+            'brand': brand,
             'retailer': 'woolworths',
             'weight': extract_weight(item.get('size', {}).get('volumeSize', '')),
             'UMF': umf,
             'MGO': mgo,
             'price': price,
-            'value': multi_cup_value,
+            'marginal_price': multi_cup_value,
         }

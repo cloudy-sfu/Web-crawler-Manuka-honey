@@ -24,7 +24,7 @@ Included retailers:
 
 ## Install
 
-Create a Python virtual environment.
+Create a Python 3.12 virtual environment and activate.
 
 Run the following command.
 
@@ -34,22 +34,17 @@ pip install -r requirements.txt
 
 ## Usage
 
-In Python virtual environment, run the following command.
+Activate the Python virtual environment.
+
+Run the following command in Windows command prompt (CMD).
 
 ```
 python main.py
-python visualization.py
 ```
 
-The result can be found in `results/manuka_honey_price.xlsx`.
-
-In the table, 
-
-- "value": price where T&C applies, like bundles or wholesale discount.
-
-- "UMF" and "MGO": See [UMF organization](https://www.umf.org.nz/unique-manuka-factor/).
+The dataset is published at [hugging face](https://huggingface.co/datasets/cloudy-sfu/Manuka-honey).
 
 >  [!NOTE]
 >
-> Relationship between UMF and MGO are fitted from data of included brands. Factors excluding MGO have little influence on UMF based on these data.
+>  Relationship between UMF and MGO are fitted from data of included brands. Factors excluding MGO have little influence on UMF based on these data.
 

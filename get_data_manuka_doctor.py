@@ -1,5 +1,6 @@
 import json
 
+import numpy as np
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from requests import Session
@@ -37,7 +38,7 @@ def search_manuka_doctor():
             'retailer': 'manuka doctor',
             'weight': extract_weight(name),
             'UMF': umf,
-            'MGO': mgo,
+            'MGO': mgo or np.nan,
             'price': price,
-            'value': price,
+            'marginal_price': price,
         }

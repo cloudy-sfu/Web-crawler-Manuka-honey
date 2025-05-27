@@ -111,11 +111,11 @@ def search_new_world(brand: str, store_id: str):
                 else:
                     price = min(proposed_price, price)
         yield {
-            'brand': re.sub("\s*honey\s*", "", raw_brand),
+            'brand': re.sub(r"\s*honey\s*", "", raw_brand),
             'retailer': "new_world",
             'weight': extract_weight(product.get("displayName", "")),
             'UMF': umf,
             'MGO': mgo,
             'price': price,
-            'value': price_value,
+            'marginal_price': price_value,
         }

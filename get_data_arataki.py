@@ -49,5 +49,5 @@ def search_arataki():
             'UMF': umf,
             'MGO': mgo,
             'price': price,
-            'value': price,
+            'marginal_price': price,
         }
