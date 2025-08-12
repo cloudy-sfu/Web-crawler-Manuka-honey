@@ -2,6 +2,7 @@
 import json
 import logging
 
+import demjson3
 from bs4 import BeautifulSoup
 from requests import Session
 
@@ -25,12 +26,12 @@ def search_arataki():
     products_js = response_html.find(
         'script', {'id': 'web-pixels-manager-setup'}).text
     products_match = re.search(
-        r'webPixelsManagerAPI\.publish\("collection_viewed",\s*({.*?})\)',
+        r'\[\\"collection_viewed\\",\s*({.*?})]]\"}\);',
         products_js, re.DOTALL
     )
     assert products_match, "Fail to parse Egmont products data."
     products_json = products_match.group(1)
-    products = json.loads(products_json)
+    products = demjson3.decode(products_json.replace("\\", ""))
 
     for product in products.get('collection', {}).get('productVariants', []):
         name = product.get("product", {}).get("untranslatedTitle", '')
