@@ -2,7 +2,7 @@ name: Publish to hugging face datatset
 
 on:
   schedule:
-    - cron: '0 22 * * 0,2,4'  # Monday, Wednesday, Friday 10:00 UTC+12
+    - cron: '0 22 * * 0,4'  # Monday, Friday 10:00 UTC+12
   workflow_dispatch:
 
 jobs:
