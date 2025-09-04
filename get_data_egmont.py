@@ -81,9 +81,9 @@ def parse_honey_string(title):
 def get_egmont_bundle(single_item: pd.DataFrame):
     bundles = {
         "Soothe & Vitality Bundle":
-            "https://www.egmonthoney.co.nz/products/soothe-vitality-bundle",
+            "https://www.egmonthoney.co.nz/products/soothe-vitality-manuka-honey-bundle",
         "Intense Support Bundle":
-            "https://www.egmonthoney.co.nz/products/intense-support-bundle"
+            "https://www.egmonthoney.co.nz/products/intense-support-manuka-honey-bundle"
     }
     for bundle_name, bundle_url in bundles.items():
         response = sess.get(url=bundle_url, headers=header, timeout=3)
