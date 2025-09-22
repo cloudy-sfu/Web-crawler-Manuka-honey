@@ -1,6 +1,7 @@
 # https://www.egmonthoney.co.nz/collections/umf-manuka-honey
 import json
 import logging
+from weakref import finalize
 
 import demjson3
 import pandas as pd
@@ -38,6 +39,7 @@ def search_egmont():
     products_json = products_match.group(1)
     products = demjson3.decode(products_json.replace("\\", ""))
 
+    x = []
     for product in products.get('collection', {}).get('productVariants', []):
         name = product.get("product", {}).get("untranslatedTitle", '')
         if not ('MGO' in name or 'UMF' in name):
@@ -49,7 +51,7 @@ def search_egmont():
             logging.warning(f"Retailed by 'Egmont', the currency of the price of {name} "
                             f"is not NZD.")
         price = product.get('price', {}).get('amount')
-        yield {
+        x.append({
             'brand': 'egmont',
             'retailer': 'egmont',
             'weight': extract_weight(name),
@@ -57,24 +59,19 @@ def search_egmont():
             'MGO': mgo,
             'price': price,
             'marginal_price': price,
-        }
+        })
+    return x
 
 
 def parse_honey_string(title):
-    # Separate regex patterns for different components
-    num_pattern = re.compile(r"x(\d+)", re.IGNORECASE)
+    num_pattern = re.compile(r"(\d+)x|x(\d+)", re.IGNORECASE)
     umf_pattern = re.compile(r"UMF\s+(\d+)\+?", re.IGNORECASE)
-
-    # Extract components individually
     num_match = num_pattern.search(title)
     umf_match = umf_pattern.search(title)
-
-    # Process weight to grams
-    weight = extract_weight(title)
     return {
-        "num": int(num_match.group(1)),
+        "num": int(num_match.group(1) or num_match.group(2)),
         "umf": int(umf_match.group(1)),
-        "weight": weight
+        "weight": extract_weight(title)
     }
 
 
@@ -83,7 +80,9 @@ def get_egmont_bundle(single_item: pd.DataFrame):
         "Soothe & Vitality Bundle":
             "https://www.egmonthoney.co.nz/products/soothe-vitality-manuka-honey-bundle",
         "Intense Support Bundle":
-            "https://www.egmonthoney.co.nz/products/intense-support-manuka-honey-bundle"
+            "https://www.egmonthoney.co.nz/products/intense-support-manuka-honey-bundle",
+        "Ultimate Duo":
+            "https://www.egmonthoney.co.nz/products/luxury-manuka-honey-bundle-umf-23-umf-25-250g",
     }
     for bundle_name, bundle_url in bundles.items():
         response = sess.get(url=bundle_url, headers=header, timeout=3)
@@ -96,17 +95,20 @@ def get_egmont_bundle(single_item: pd.DataFrame):
                            .find('span', {'class': 'money'}).text)
             total_price = re.search(r"\d+(\.\d{1,2})?", total_price)
             total_price = float(total_price.group())
-        except:
-            logging.warning(f"Total price of {bundle_name} in Egmont is not parsed.")
+        except Exception as e:
+            logging.warning(f"Total price of {bundle_name} in Egmont is not parsed. {e}")
             continue
         content = []
 
         # Get bundle contents.
-        raw_bundle_list = response_html.find('ul', {'data-mce-fragment': '1'})
-        if not raw_bundle_list:
-            logging.warning(f"Products list of {bundle_name} in Egmont is not parsed.")
-        for item in raw_bundle_list.find_all('li', {'data-mce-fragment': '1'}):
-            content.append(parse_honey_string(item.text))
+        try:
+            raw_bundle_list = response_html.find(
+                'div', {'data-block-type': 'description'}).find('ul')
+            for item in raw_bundle_list.find_all('li'):
+                content.append(parse_honey_string(item.text))
+        except AttributeError as e:
+            logging.warning(f"Products list of {bundle_name}, Egmont bundle cannot "
+                            f"be parsed. {e}")
         content = pd.DataFrame(content)
 
         # Update "value" column in single items' table.

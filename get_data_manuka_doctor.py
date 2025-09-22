@@ -24,6 +24,7 @@ def search_manuka_doctor():
 
     # Get item list.
     products_html = response_html.find("section", {"class": "row row--slim"})
+    x = []
     for product_html in products_html.contents:
         if not isinstance(product_html, Tag):
             continue
@@ -34,7 +35,7 @@ def search_manuka_doctor():
         if not ('MGO' in name or 'UMF' in name):
             continue
         umf, mgo = extract_umf_mgo(name)
-        yield {
+        x.append({
             'brand': 'manuka doctor',
             'retailer': 'manuka doctor',
             'weight': extract_weight(name),
@@ -42,4 +43,5 @@ def search_manuka_doctor():
             'MGO': mgo or np.nan,
             'price': price,
             'marginal_price': price,
-        }
+        })
+    return x

@@ -33,6 +33,7 @@ def search_arataki():
     products_json = products_match.group(1)
     products = demjson3.decode(products_json.replace("\\", ""))
 
+    x = []
     for product in products.get('collection', {}).get('productVariants', []):
         name = product.get("product", {}).get("untranslatedTitle", '')
         if not ('MGO' in name or 'UMF' in name):
@@ -43,7 +44,7 @@ def search_arataki():
             logging.warning(f"Retailed by 'Egmont', the currency of the price of {name} "
                             f"is not NZD.")
         price = product.get('price', {}).get('amount')
-        yield {
+        x.append({
             'brand': 'arataki',
             'retailer': 'arataki',
             'weight': extract_weight(name),
@@ -51,4 +52,5 @@ def search_arataki():
             'MGO': mgo,
             'price': price,
             'marginal_price': price,
-        }
+        })
+    return x

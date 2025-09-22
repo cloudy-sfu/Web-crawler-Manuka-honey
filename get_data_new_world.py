@@ -89,6 +89,7 @@ def search_new_world(brand: str, store_id: str):
                         "program doesn't support multiple pages, please update.")
 
     products = products_resp_dict.get("products", {})
+    x = []
     for product in products:
         raw_brand = product.get("brand", "").lower()
         umf, mgo = extract_umf_mgo(product.get("name", ""))
@@ -112,7 +113,7 @@ def search_new_world(brand: str, store_id: str):
                     price_value = min(proposed_price, price_value)
                 else:
                     price = min(proposed_price, price)
-        yield {
+        x.append({
             'brand': re.sub(r"\s*honey\s*", "", raw_brand),
             'retailer': "new_world",
             'weight': extract_weight(product.get("displayName", "")),
@@ -120,4 +121,5 @@ def search_new_world(brand: str, store_id: str):
             'MGO': mgo,
             'price': price,
             'marginal_price': price_value,
-        }
+        })
+    return x

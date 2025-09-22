@@ -11,6 +11,7 @@ with open("headers/woolworths.json", "r") as f:
 
 
 def search_woolworths(search_word: str):
+    x = []
     # Request the page.
     response = sess.get(
         url="https://www.woolworths.co.nz/api/v1/products",
@@ -31,7 +32,7 @@ def search_woolworths(search_word: str):
         # cannot use `get` because possibly: products still exist but value is None
         items = products['products']['items']
     except (KeyError, TypeError):
-        return
+        return x
     for item in items:
         brand = item.get('brand')
         if brand is None:
@@ -44,7 +45,7 @@ def search_woolworths(search_word: str):
             multi_cup_value = item['productTag'].get('multiBuy', {}).get('multiCupValue')
         else:
             multi_cup_value = price
-        yield {
+        x.append({
             'brand': brand,
             'retailer': 'woolworths',
             'weight': extract_weight(item.get('size', {}).get('volumeSize', '')),
@@ -52,4 +53,5 @@ def search_woolworths(search_word: str):
             'MGO': mgo,
             'price': price,
             'marginal_price': multi_cup_value,
-        }
+        })
+    return x
