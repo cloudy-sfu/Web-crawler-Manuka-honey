@@ -19,7 +19,7 @@ def search_arataki():
         url="https://www.aratakihoney.co.nz/collections/manuka-honey",
         headers=header, timeout=3,
     )
-    assert response.status_code == 200, "Fail to get Woolworths products."
+    assert response.status_code == 200, "Fail to get Arataki products."
     response_html = BeautifulSoup(response.text, 'html.parser')
 
     # Get item list.
@@ -29,7 +29,7 @@ def search_arataki():
         r'\[\\"collection_viewed\\",\s*({.*?})]]\"}\);',
         products_js, re.DOTALL
     )
-    assert products_match, "Fail to parse Egmont products data."
+    assert products_match, "Fail to parse Arataki products data."
     products_json = products_match.group(1)
     products = demjson3.decode(products_json.replace("\\", ""))
 

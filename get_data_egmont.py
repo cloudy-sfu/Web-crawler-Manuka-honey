@@ -1,7 +1,6 @@
 # https://www.egmonthoney.co.nz/collections/umf-manuka-honey
 import json
 import logging
-from weakref import finalize
 
 import demjson3
 import pandas as pd
@@ -20,6 +19,18 @@ egmont_umf_to_mgo = {  # understand from product images
 
 
 def search_egmont():
+    sess.post(
+        url="https://www.egmonthoney.co.nz/localization",
+        data={
+            "form_type": "localization",
+            "utf8": "✓",
+            "_method": "put",
+            "return_to": "/collections/all",
+            "country_code": "NZ",
+        },
+        headers=header, timeout=3,
+    )
+
     # Request the page.
     response = sess.get(
         url="https://www.egmonthoney.co.nz/collections/umf-manuka-honey",
@@ -76,13 +87,23 @@ def parse_honey_string(title):
 
 
 def get_egmont_bundle(single_item: pd.DataFrame):
+    sess.post(
+        url="https://www.egmonthoney.co.nz/localization",
+        data={
+            "form_type": "localization",
+            "utf8": "✓",
+            "_method": "put",
+            "return_to": "/collections/all",
+            "country_code": "NZ",
+        },
+        headers=header, timeout=3,
+    )
+
     bundles = {
         "Soothe & Vitality Bundle":
             "https://www.egmonthoney.co.nz/products/soothe-vitality-manuka-honey-bundle",
         "Intense Support Bundle":
             "https://www.egmonthoney.co.nz/products/intense-support-manuka-honey-bundle",
-        "Ultimate Duo":
-            "https://www.egmonthoney.co.nz/products/luxury-manuka-honey-bundle-umf-23-umf-25-250g",
     }
     for bundle_name, bundle_url in bundles.items():
         response = sess.get(url=bundle_url, headers=header, timeout=3)
