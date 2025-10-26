@@ -4,9 +4,29 @@ Compare price of Manuka honey in New Zealand
 ![](https://shields.io/badge/region-New_Zealand-navy)
 ![](https://shields.io/badge/dependencies-Python_3.12-blue)
 
-> [!WARNING]
->
-> There're evidences that some of these online shopping websites infer users' region via IP address, affecting the currency (therefore incomparable prices). If not in New Zealand, the user may need a proxy.
+## Install
+
+Create a Python 3.12 virtual environment and activate.
+
+Run the following command.
+
+```
+pip install -r requirements.txt
+```
+
+Create a PostgreSQL 17 database in [Neon](https://neon.com/) database. (If using other database, the schema is "public". Fill `NEON_DB` with the connection string of your own PostgreSQL database.)
+
+Refer to `DDL` to create tables and know the meaning of columns. (If using other database, the user role in DDL should be adapted.)
+
+Include the following variables into environment variables.
+
+| Variable | Description                         |
+| -------- | ----------------------------------- |
+| NEON_DB  | Connection string to Neon database. |
+
+## Usage
+
+GitHub Actions record current price every Sunday, Thursday 22:00 UTC.
 
 Included brands:
 
@@ -21,28 +41,6 @@ Included retailers:
 - Egmont gift shop
 - Arataki honey
 - Manuka doctor
-
-## Install
-
-Create a Python 3.12 virtual environment and activate.
-
-Run the following command.
-
-```
-pip install -r requirements.txt
-```
-
-## Usage
-
-Activate the Python virtual environment.
-
-Run the following command in Windows command prompt (CMD).
-
-```
-python main.py
-```
-
-The dataset is published at [hugging face](https://huggingface.co/datasets/cloudy-sfu/Manuka-honey).
 
 >  [!NOTE]
 >

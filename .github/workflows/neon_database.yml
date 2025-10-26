@@ -1,4 +1,4 @@
-name: Publish to hugging face datatset
+name: Publish to Neon database
 
 on:
   schedule:
@@ -8,6 +8,9 @@ on:
 jobs:
   run-script:
     runs-on: ubuntu-latest
+
+    env:
+      NEON_DB: ${{ secrets.NEON_DB }}
 
     steps:
       - name: Checkout code
@@ -20,14 +23,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r requirements-routine.txt
 
       - name: Run the script
         run: |
           python main.py
-
-      - name: Publish to hugging face dataset
-        run: |
-          pip install huggingface-hub
-          huggingface-cli login --token ${{ secrets.HF_TOKEN }}
-          huggingface-cli upload cloudy-sfu/Manuka-honey results --repo-type=dataset

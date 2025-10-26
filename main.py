@@ -1,6 +1,7 @@
 import os
 
 import pandas as pd
+from sqlalchemy import create_engine, text
 
 from get_data_arataki import search_arataki
 from get_data_egmont import search_egmont, get_egmont_bundle
@@ -8,7 +9,6 @@ from get_data_manuka_doctor import search_manuka_doctor
 from get_data_new_world import search_new_world
 from get_data_woolworths import search_woolworths
 from umf_mgo_conversion import mgo_to_umf, umf_to_mgo
-from visualization import mgo_price_weight_fig
 
 # %% Get data.
 honey = []
@@ -51,15 +51,14 @@ honey['UMF'] = honey.apply(lambda row: mgo_to_umf(row['MGO'])
 if pd.isna(row['UMF']) and not pd.isna(row['MGO']) else row['UMF'], axis=1)
 honey['MGO'] = honey.apply(lambda row: umf_to_mgo(row['UMF'])
 if pd.isna(row['MGO']) and not pd.isna(row['UMF']) else row['MGO'], axis=1)
-now = pd.Timestamp('now', tz='Pacific/Auckland')
-honey.insert(loc=0, column="date", value=now.strftime("%Y-%m-%d"))
+# marginal price conversion: per package -> per KG
+honey["marginal_price"] = honey["marginal_price"] / honey["weight"] * 1000
 
 # %% Export.
-output_path = f"results/{now.strftime("%Y-%m")}/{now.strftime("%Y-%m-%d")}"
-os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-honey.to_csv(output_path + ".csv", index=False)
-fig = mgo_price_weight_fig(honey)
-fig.text(0.01, 0.01, f'Updated at {now.strftime("%Y-%m-%d %H:%M:%S %z")}',
-         ha='left', fontsize=10)
-fig.savefig("results/Current price report.pdf")
+engine = create_engine(os.environ['NEON_DB'])
+with engine.begin() as c:
+    delete_query = text("DELETE FROM public.prices "
+                        "WHERE updated_time >= NOW() - INTERVAL '12 hours'")
+    c.execute(delete_query)
+    honey.to_sql(name="prices", con=c, schema="public", if_exists="append",
+                 index=False)
