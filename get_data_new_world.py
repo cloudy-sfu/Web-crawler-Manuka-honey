@@ -3,6 +3,7 @@ import base64
 import json
 import logging
 import os
+import random
 import secrets
 import string
 import urllib.parse
@@ -56,10 +57,15 @@ def search_new_world(brand: str, store_id: str):
     header_newrelic_ins = deepcopy(header_newrelic)
     header_newrelic_ins['newrelic'] = new_relic_base64
     header_newrelic_ins['referer'] = referer
-    current_user_resp = sess.get(
-        url="https://www.newworld.co.nz//CommonApi/Account/GetCurrentUser",
+    current_user_resp = sess.post(
+        url="https://www.newworld.co.nz/api/user/get-current-user",
         headers=header_newrelic_ins,
         timeout=3,
+        data={
+            "fingerprintGuest": header_newrelic_ins['user-agent'],
+            "fingerprintUser": ''.join(
+                random.choices(string.ascii_lowercase + string.digits, k=32))
+        }
     )
     assert current_user_resp.status_code == 200, "Fail to request New World products list."
     token_dict = current_user_resp.json()
